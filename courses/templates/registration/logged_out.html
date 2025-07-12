@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block title %}
+  Выход
+{% endblock %}
+{% block content %}
+  <h1>Выход</h1>
+  <div class="module">
+    <p>
+      Выход выполнен успешно. Вы можете <a href="{% url 'login' %}">войти заново</a>.
+    </p>
+  </div>
+{% endblock %}

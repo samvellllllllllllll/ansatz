@@ -9,3 +9,7 @@ def model_name(obj):
         return obj._meta.model_name
     except AttributeError:
         return None
+
+@register.filter(name="in_group")  
+def in_group(user, group):
+    return user.groups.filter(name=group).exists()

@@ -4,6 +4,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
 from .fields import OrderField
 from django.template.loader import render_to_string
+from students.models import CustomUser
 # from django.utils.translation import gettext_lazy as _
 class Subject(models.Model):
     title=models.CharField(max_length=200)
@@ -14,13 +15,13 @@ class Subject(models.Model):
         return self.title
 
 class Course(models.Model):
-    owner=models.ForeignKey(User, related_name='courses_created', on_delete=models.CASCADE, verbose_name='Владелец')
+    owner=models.ForeignKey(CustomUser, related_name='courses_created', on_delete=models.CASCADE, verbose_name='Владелец')
     subject=models.ForeignKey(Subject,related_name='courses', on_delete=models.CASCADE, verbose_name='Предмет')
     title=models.CharField(verbose_name='Название',max_length=200)
     slug=models.SlugField(verbose_name='slug',max_length=200, unique=True)
     overview=models.TextField(verbose_name='Описание')
     created=models.DateTimeField(auto_now_add=True)
-    students = models.ManyToManyField(User,related_name='courses_joined',blank=True)
+    students = models.ManyToManyField(CustomUser,related_name='courses_joined',blank=True)
     
     class Meta:
         ordering=['-created']
@@ -51,7 +52,7 @@ class Content(models.Model):
         ordering=['order']
         
 class ItemBase(models.Model):
-    owner=models.ForeignKey(User, related_name='%(class)s_related', on_delete=models.CASCADE)
+    owner=models.ForeignKey(CustomUser, related_name='%(class)s_related', on_delete=models.CASCADE)
     title=models.CharField(verbose_name='Название',max_length=250)
     creted=models.DateTimeField(auto_now_add=True)
     updated=models.DateTimeField(auto_now=True)

@@ -131,3 +131,20 @@ CHANNEL_LAYERS = {
         },
     },
 }
+AUTH_USER_MODEL = 'auth.User'
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.yandex.ru'
+EMAIL_PORT = 465
+EMAIL_USE_SSL = True
+EMAIL_HOST_USER = 'ansatzschool@yandex.ru'  
+EMAIL_HOST_PASSWORD = 'tojvswpiucdaasro'  
+DEFAULT_FROM_EMAIL = 'ansatzschool@yandex.r'
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    # 'users.backends.EmailAuthBackend',
+]
+
+LOGIN_URL = '/login/'
+LOGIN_REDIRECT_URL = '/'

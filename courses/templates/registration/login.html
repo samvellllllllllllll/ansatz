@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% block title %}
+{% comment %} {% block title %}
   Вход
 {% endblock %}
 {% block content %}
@@ -20,6 +20,135 @@
         </p>
       </form>
     </div>
-    Если у вас нет аккаунта, то вы можете <a href="{% url 'student_registration' %}">зарегистрироваться</a>
+    Если у вас нет аккаунта, то вы можете <a href="{% url 'register' %}">зарегистрироваться</a>
   </div>
+{% endblock %} {% endcomment %}
+
+{% block title %}Вход{% endblock %}
+
+{% block content %}
+<div class="login-container">
+    <div class="login-card">
+        <h1 class="login-title">Вход в систему</h1>
+        
+        {% if form.errors %}
+            <p class="login-error">Не удалось войти. Пожалуйста, проверьте введённые данные.</p>
+        {% else %}
+            <p class="login-description">Используйте следующую форму для входа:</p>
+        {% endif %}
+        
+        <form class="login-form" action="{% url 'login' %}" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ next }}" />
+            
+            <div class="form-group">
+                <label for="id_username">Email</label>
+                <input type="text" name="username" id="id_username" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="id_password">Пароль</label>
+                <input type="password" name="password" id="id_password" required>
+            </div>
+            
+            <button type="submit" class="login-button">Войти</button>
+        </form>
+        
+        <p class="login-footer">
+            Нет аккаунта? <a href="{% url 'register' %}" class="register-link">Зарегистрироваться</a>
+        </p>
+    </div>
+</div>
+
+<style>
+    .login-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 70vh;
+        padding: 1.5rem;
+    }
+    
+    .login-card {
+        width: 100%;
+        max-width: 400px;
+        padding: 2rem;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    .login-title {
+      font-size: 1.5rem;
+      color: #333;
+      margin: 0 0 1.5rem 0; /* Сброс auto для правильного центрирования */
+      text-align: center; /* Основное свойство для центрирования текста */
+      width: 100%;
+      padding: 0.75rem 0;
+        
+    }
+    
+    .login-description, .login-error {
+        text-align: center;
+        margin-bottom: 1.5rem;
+        color: #555;
+    }
+    
+    .login-error {
+        color: #dc3545;
+    }
+    
+    .form-group {
+        margin-bottom: 1.25rem;
+    }
+    
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        color: #333;
+    }
+    
+    .form-group input {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 1rem;
+    }
+    
+    .login-button {
+        width: 100%;
+        padding: 0.75rem;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        font-size: 1rem;
+        font-weight: 500;
+        cursor: pointer;
+        margin-top: 0.5rem;
+        transition: background-color 0.2s;
+    }
+    
+    .login-button:hover {
+        background-color: #45a049;
+    }
+    
+    .login-footer {
+        text-align: center;
+        margin-top: 1.5rem;
+        color: #666;
+    }
+    
+    .register-link {
+        color: #4CAF50;
+        text-decoration: none;
+        font-weight: 500;
+    }
+    
+    .register-link:hover {
+        text-decoration: underline;
+    }
+</style>
 {% endblock %}

@@ -10,7 +10,8 @@ from .forms import CourseEnrollForm
 from django.views.generic.list import ListView
 from courses.models import Course
 from django.views.generic.detail import DetailView
-
+from django.contrib import messages
+from django.core.mail import send_mail
 # class StudentRegistrationView(CreateView):
 #     template_name='students/student/registration.html'
 #     form_class=CustomUserCreationForm
@@ -23,17 +24,40 @@ from django.views.generic.detail import DetailView
 #         login(self.request, user)
 #         return result
 
-class StudentEnrollCourseView(LoginRequiredMixin, FormView):
+# class StudentEnrollCourseView(LoginRequiredMixin, FormView):
+#     course=None
+#     form_class=CourseEnrollForm
+
+#     def form_valid(self, form):
+#         self.course=form.cleaned_data['course']
+#         self.course.students.add(self.request.user)
+#         return super().form_valid(form)
+    
+#     def get_success_url(self):
+#         return reverse_lazy('student_course_detail', args=[self.course.id])
+
+class StudentApplyCourseView(LoginRequiredMixin, FormView):
     course=None
     form_class=CourseEnrollForm
 
     def form_valid(self, form):
         self.course=form.cleaned_data['course']
-        self.course.students.add(self.request.user)
+        self.course.applications.add(self.request.user)
+        send_mail(
+                subject="Заявка на курс",
+                message= f"{self.request.user.email} отправил заявку на '{self.course.title}'. Идентификатор курса: {self.course.id}",
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=["s.89041229317@gmail.com"],
+                fail_silently=False,
+            )
+        messages.success(
+            self.request,
+            f'Вы успешно подали заявку на курс "{self.course.title}"!'
+        )
         return super().form_valid(form)
     
     def get_success_url(self):
-        return reverse_lazy('student_course_detail', args=[self.course.id])
+        return reverse_lazy('course_detail', args=[self.course.slug])
     
 class StudentCourseListView(LoginRequiredMixin, ListView):
     model=Course
@@ -57,7 +81,8 @@ class StudentCourseDetailView(DetailView):
         if 'module_id' in self.kwargs:
             context['module']=course.modules.get(id=self.kwargs['module_id'])
         else:
-            context['module']=course.modules.all()[0]
+            if course.modules.count()>0:
+                context['module']=course.modules.all()[0]
         return context
     
 from django.shortcuts import redirect

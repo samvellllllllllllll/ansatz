@@ -1,34 +1,189 @@
 {% extends "base.html" %}
-
 {% block title %}
   {{ object.title }}
 {% endblock %}
 
 {% block content %}
   {% with subject=object.subject %}
-    <h1>
-      {{ object.title }}
-    </h1>
-    <div class="module">
-      <h2>Обзор</h2>
-      <p>
-        <a href="{% url "course_list_subject" subject.slug %}">
-        {{ subject.title }}</a>.
-        Количество модулей {{ object.modules.count }}.
-        Преподаватель: {{ object.owner.get_full_name }}.
-      </p>
-      {{ object.overview|linebreaks }}
-      {% if request.user.is_authenticated %}
-        <form action="{% url "student_enroll_course" %}" method="post">
-          {{ enroll_form }}
-          {% csrf_token %}
-          <input type="submit" class="submit-btn" value="Отправить заявку">
-        </form>
-      {% else %}
-        <a href="{% url "student_registration" %}" class="button">
-          Зарегистрируйтесь, чтобы записаться
-        </a>
+    <div class="course-detail">
+      <h1 class="course-title">
+        {{ object.title }}
+      </h1>
+      
+      {# Блок сообщений #}
+      {% if messages %}
+        <div class="message-container">
+          {% for message in messages %}
+            <div class="message message-{{ message.tags }}">
+              <span class="message-text">{{ message }}</span>
+              <button class="message-close" onclick="this.parentElement.remove()">×</button>
+            </div>
+          {% endfor %}
+        </div>
       {% endif %}
+      
+      <div class="course-module">
+        <h2 class="module-title">Обзор</h2>
+        <div class="module-content">
+          <p class="module-info">
+            <a href="{% url 'course_list_subject' subject.slug %}" class="subject-link">
+              {{ subject.title }}
+            </a>.
+            Количество модулей: {{ object.modules.count }}.
+            Преподаватель: {{ object.owner.get_full_name }}.
+          </p>
+          <div class="overview">
+            {{ object.overview|linebreaks }}
+          </div>
+          
+          {% if request.user.is_authenticated %}
+
+          {% if request.user in object.students.all %}
+          <div class="message message-info">
+            <span class="message-text">Вы уже записаны на этот курс</span>
+          </div>
+          {% elif request.user in object.applications.all %}
+          <div class="message message-info">
+            <span class="message-text">Вы уже отправили заявку на этот курс</span>
+          </div>
+          
+          {% else %}
+        
+            <form action="{% url 'student_apply_course' %}" method="post" class="enroll-form">
+              {{ enroll_form }}
+              {% csrf_token %}
+              <button type="submit" class="submit-btn">Отправить заявку</button>
+            </form>
+            {% endif %}
+          {% else %}
+            <a href="{% url 'login' %}" class="login-link">
+              Войдите, чтобы записаться на курс
+            </a>
+
+          {% endif %}
+        </div>
+      </div>
     </div>
   {% endwith %}
+
+  <style>
+    /* Стили для сообщений */
+    .message-container {
+      margin: 15px 0;
+    }
+    
+    .message {
+      position: relative;
+      padding: 12px 20px;
+      margin: 10px 0;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    
+    .message-success {
+      background-color: #e6f7e6;
+      color: #2d662d;
+      border-left: 4px solid #2d662d;
+    }
+    
+    .message-error {
+      background-color: #ffebeb;
+      color: #d32f2f;
+      border-left: 4px solid #d32f2f;
+    }
+    
+    .message-warning {
+      background-color: #fff8e6;
+      color: #e68a00;
+      border-left: 4px solid #e68a00;
+    }
+    
+    .message-info {
+      background-color: #e6f3ff;
+      color: #0066cc;
+      border-left: 4px solid #0066cc;
+    }
+    
+    .message-close {
+      background: none;
+      border: none;
+      font-size: 18px;
+      cursor: pointer;
+      color: inherit;
+      padding: 0 0 0 10px;
+      margin-left: 10px;
+    }
+    
+    /* Общие стили */
+    .course-detail {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    .course-title {
+      color: #333;
+      margin-bottom: 20px;
+    }
+    
+    .course-module {
+      background: #f9f9f9;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .module-title {
+      color: #444;
+      margin-top: 0;
+    }
+    
+    .subject-link {
+      color: #1a73e8;
+      text-decoration: none;
+    }
+    
+    .subject-link:hover {
+      text-decoration: underline;
+    }
+    
+    .overview {
+      margin: 15px 0;
+      line-height: 1.6;
+    }
+    
+    .enroll-form {
+      margin-top: 20px;
+    }
+    
+    .submit-btn {
+      background-color: #1a73e8;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    
+    .submit-btn:hover {
+      background-color: #0d5bba;
+    }
+    
+    .login-link {
+      display: inline-block;
+      background-color: #1a73e8;
+      color: white;
+      padding: 10px 15px;
+      border-radius: 4px;
+      text-decoration: none;
+    }
+    
+    .login-link:hover {
+      background-color: #0d5bba;
+    }
+  </style>
 {% endblock %}

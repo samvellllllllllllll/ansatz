@@ -22,7 +22,8 @@ class Course(models.Model):
     overview=models.TextField(verbose_name='Описание')
     created=models.DateTimeField(auto_now_add=True)
     students = models.ManyToManyField(CustomUser,related_name='courses_joined',blank=True)
-    
+    # my
+    applications = models.ManyToManyField(CustomUser,related_name='courses_applied',blank=True)
     class Meta:
         ordering=['-created']
 
